@@ -35,7 +35,8 @@ const INTENTS: { patterns: RegExp[]; handler: IntentHandler }[] = [
   // ── Rewards / Balance ─────────────────────────────────────────────
   {
     patterns: [
-      /\b(reward|points?|balance|loyalty|tier)\b/i,
+      /\b(rewards?|points?|balance|loyalty|tier|wallet)\b/i,
+      /\bcheck\b.*\b(rewards?|points?|balance|wallet)\b/i,
       /\b(how much|what.*(have|got))\b.*\b(balance|points?|wallet)\b/i,
     ],
     handler: handleRewards,
@@ -270,8 +271,8 @@ async function handleMenu(req: VoiceRequest, mcp: McpClientManager): Promise<Voi
 
 async function handleOrder(req: VoiceRequest, mcp: McpClientManager): Promise<VoiceResponse> {
   // Extract what they want to order from the text
-  const itemMatch = req.text.match(/(?:order|get|want|like|have)\s+(?:a\s+)?(.+?)(?:\s+from|\s+at|\s*$)/i);
-  const itemName = itemMatch?.[1]?.trim() || req.text;
+  const itemMatch = req.text.match(/(?:(?:to\s+)?(?:order|get|want|like|have))\s+(?:a\s+|an\s+)?(.+?)(?:\s+from|\s+at|\s*$)/i);
+  const itemName = (itemMatch?.[1]?.trim() || req.text).replace(/^(?:to\s+(?:order|get)\s+(?:a\s+|an\s+)?)/i, '');
 
   return {
     response: `I'd love to help you order "${itemName}". Let me find that on the menu. First, which store would you like to order from?`,
